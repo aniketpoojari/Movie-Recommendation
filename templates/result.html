@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.8.0.min.js"></script>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+
+*{
+    display: relative;
+}
+
+body{
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.box{
+    position: relative;
+    top: 10px;
+    padding: 0;
+    width: 70%;
+    margin: 0 auto;
+}
+
+form{
+    position: relative;
+    padding: 0;
+    width: 100%;
+}
+
+#myInput {
+    position: relative;
+    margin: 0 auto;
+    padding: 10px;
+    width: 100%;
+    height: 80px;
+    background: none;
+    border: 4px solid #ffd52d;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: Comic Sans MS;
+    font-size: 26px;
+    color: #ffd52d;
+    outline: none;
+}
+
+.autocomplete {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.autocomplete-items {
+    position: absolute;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    overflow-y: scroll;
+    max-height: 300px;
+}
+
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.9); 
+    font-family: Comic Sans MS;
+    border: 4px solid #ffd52d;
+    border-radius: 15px;
+    border-top: none;
+}
+
+.autocomplete-items div:hover {
+    background-color: #e9e9e9; 
+}
+
+.autocomplete-active {
+    background-color: DodgerBlue !important; 
+    color: #ffffff; 
+}
+
+strong {
+    color: #ffd52d;
+}
+
+h1{
+    color: white;
+    text-shadow: 2px 2px white;
+}
+
+ ::placeholder {
+  color: #ffd52d;
+  opacity: 1;
+ }
+
+ .loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>     
+<body style="background-image:url('{{ result.backdrop_path }}');">
+
+
+    <div class = 'row'>
+        <div class="box">
+            <form id="search" autocomplete="off" action="{{ url_for('recommend') }}" method="POST">
+                <div class="autocomplete">
+                    <input class="input" id="myInput" type="text" name="txt">
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <center><div class="row loader"></div></center>
+    
+    <div class = 'row'>
+        <div class="col l4 s12"">
+            <center><img src='{{ result.poster_path }}' style="width:50%; box-shadow: 0px 0px 20px #fff;"></center>
+        </div>
+        <div class="col l8 s12" style=" color:white;">
+            <h5>
+                <div>
+                    TITLE: {{result.movie_title}}
+                </div>
+                </br>
+                <div>
+                    OVERVIEW: {{result.overview}}
+                </div>
+                </br>
+                <div>
+                    GENERES: {{result.genres}}
+                </div>
+                </br>
+                <div>
+                    RELEASE DATE: {{result.release_date}}
+                </div>
+                </br>
+                <div>
+                    VOTE: {{result.vote_average}} ({{result.vote_count}})
+                </div>
+                </br>
+                <div>
+                    RUNTIME: {{result.runtime}} MINS
+                </div>
+                </br>
+                <div>
+                    STATUS: {{result.status}}
+                </div>
+            </h5>
+        </div>
+    </div>
+    <div class = 'row'>
+        <center><h1>CAST</h1></center>
+    </div>
+    <div class = "row">
+        {% for i in result.cast %}
+            <div class="col l2 m4 s6">
+                <div class="card z-depth-3">
+                    <div class="card-image waves-effect waves-block waves-light">
+                      <img class="activator" style="max-width:100%; max-height:100%;" src='{{ i.profile_path }}'>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title activator grey-text text-darken-4">{{ i.name }}<i class="material-icons right">more_vert</i></span>
+                    </div>
+                    <div class="card-reveal">
+                        <span class="card-title grey-text text-darken-4">{{ i.name }}<i class="material-icons right">close</i></span>
+                        <span class="card-title grey-text text-darken-4">as</span>
+                        <span class="card-title grey-text text-darken-4">{{ i.character }}</span>
+                        <p>{{ i.biography }}</p>
+                    </div>
+                  </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class = 'row'>
+        <center><h1>SIMILAR MOVIES</h1></center>
+    </div>
+    <div class = 'row'>
+        {% for i in result.CON_M %}
+            <div class = "col l2 m4 s6" style="height: 100%;">
+                <div class="card waves-effect waves-block waves-light" onclick="window.location.href='/link_recommend?name={{ i.movie_title }}';">
+                    <div class="card-image">
+                        <img src='{{ i.poster_path }}'>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">{{ i.movie_title }}</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if result.COLL_M|length != 0 %}
+        <div class = 'row'>
+            <center><h1>SIMILARLY LIKED MOVIES</h1></center>
+        </div>
+        <div class = 'row'>
+            {% for i in result.COLL_M %}
+                <div class="col l2 m4 s6">
+                    <div class="card waves-effect waves-block waves-light" onclick=" window.location.href='/link_recommend?name={{ i.movie_title }}';">
+                        <div class="card-image">
+                            <img src='{{ i.poster_path }}'>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title">{{ i.movie_title }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+<script>
+function autocomplete(inp) {
+    var currentFocus;
+    const movies = [];
+ 
+    // WHEN TYPING IN TEXT FIELD
+    inp.addEventListener("input", function(e) {
+        var a, b, i, val = this.value;
+     
+        closeAllLists();
+     
+        if (!val) { 
+            return false;
+        }
+        currentFocus = -1;
+     
+        // div TO HOLD LIST
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+     
+        // APPEND LIST CONTAINER TO MAIN CONTAINER
+        this.parentNode.appendChild(a);
+     
+        // ACCESS FROM SUGGESTIONS FROM SERVER ONLY WHEN INPUT WAS EMPTY
+        if (val.length < 2){
+            console.log('FETCHING');
+            movies.length = 0;
+            $.ajax({  
+                type: 'POST',  
+                url: "{{ url_for('suggest') }}",  
+                data: val,  
+                contentType: 'application/json; charset=utf-8',  
+                dataType: 'text',  
+                success: function (out) {
+                    JSON.parse(out).forEach(function(m) {
+                        movies[movies.length] = m;
+                    }); 
+                }
+            });
+        } else {
+            // LOOP OVER LIST
+            for (i = 0; i < movies.length; i++) {
+                // DISPLAY ONLY IF MATCHING
+                if(movies[i].toLowerCase().includes(val.toLowerCase())){
+                    // CRETAE div
+                    b = document.createElement("DIV");   
+                    var reg = new RegExp(val, 'gi');
+                    var final_str = movies[i].replace(reg, function(str) {return '<strong>'+str+'</strong>'});
+                    b.innerHTML = final_str;
+                    //insert a input field that will hold the current array item's value
+                    b.innerHTML += "<input type='hidden' value='" + movies[i] + "'>";
+                    //execute a function when someone clicks on the item value (DIV element):
+                    b.addEventListener("click", function(e) {
+                        //insert the value for the autocomplete text field:
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        // FOCUS ON BOX
+                        document.getElementsByClassName("input")[0].focus();
+                        //close the list of autocompleted values,(or any other open lists of autocompleted values:
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        }  
+    });
+ 
+    // When working with keyboard
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+     
+        if (e.keyCode == 40) {  
+            //If the arrow DOWN key is pressed,increase the currentFocus variable:
+            currentFocus++;
+            //and and make the current item more visible:
+            addActive(x);
+        } 
+        else if (e.keyCode == 38) {
+            //If the arrow UP key is pressed,decrease the currentFocus variable:
+            currentFocus--;
+            //and and make the current item more visible:
+            addActive(x);
+        } 
+        else if (e.keyCode == 13) {  
+            //If the ENTER key is pressed, prevent the form from being submitted,
+            e.preventDefault();
+            if (currentFocus > -1) {
+                //and simulate a click on the "active" item:
+                if (x) x[currentFocus].click();
+            } else {
+                document.getElementById("search").submit();
+                document.getElementsByClassName("loader")[0].style.display = 'block';
+            }
+        }
+    });
+
+    // MAKE ELEMENT ACTIVE
+    function addActive(x) {
+        //a function to classify an item as "active":
+        if (!x) return false;
+        //start by removing the "active" class on all items:
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        //add class "autocomplete-active":
+        x[currentFocus].classList.add("autocomplete-active");
+        x[currentFocus].scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+    }
+
+    // MAKE ALL ELEMENT UNACTIVE
+    function removeActive(x) {
+        //a function to remove the "active" class from all autocomplete items:
+        for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+        }
+    }
+
+    // Close all autocomplete lists in the document, except the one passed as an argument: 
+    function closeAllLists(elmnt) {
+        currentFocus = -1;
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+            }
+        }
+    }
+}
+
+// Initiate autocomplete function on "myInput"
+autocomplete(document.getElementById("myInput"));
+</script>
+
+</body>
+</html>
